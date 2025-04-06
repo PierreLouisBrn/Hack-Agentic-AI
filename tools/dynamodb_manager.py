@@ -41,9 +41,9 @@ class DynamoDBManager:
             "sender": sender,
             "recipient": recipient,
             "date": raw_date,
-            "is_phishing": "Yes" if finale["is_phishing"] else "No",
-            "summary": finale["summary"],
-            "reason": finale["reason"],
+            "is_phishing": "Yes" if finale[0] else "No",
+            "summary": finale[1],
+            "reason": finale[2],
             "links": ", ".join(links) if links else ""
         }
         

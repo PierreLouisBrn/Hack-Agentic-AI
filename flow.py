@@ -23,11 +23,12 @@ def flows(dico):
     is_phishing=BoolMail(summary)
     print("bool ", is_phishing)
     
-    if is_phishing=="True":
-        is_phishing=True
-    else:
-        is_phishing=False
+    is_phishing = is_phishing.strip().lower() == "true"
     
+    finale=is_phishing,summary,reason
+    from tools.dynamodb_manager import DynamoDBManager
+    db_manager = DynamoDBManager()
+    db_manager.store_email_analysis(dico, finale)
 
     return {
         "is_phishing": is_phishing,
@@ -37,7 +38,7 @@ def flows(dico):
 
 
 def test():
-    Mail="""Bonjour,
+    dico=2,"aaa","zzz","eee","03/03/2020","""Bonjour,
 
     Nous avons détecté une activité inhabituelle sur votre compte. Pour des raisons de sécurité, votre accès a été temporairement suspendu.
 
@@ -48,17 +49,18 @@ def test():
 
     Sans réponse de votre part, nous serons dans l’obligation de clôturer définitivement votre compte, conformément à nos conditions générales d’utilisation.
 
-    Merci de votre compréhension."""
-    link="https://bnstockton.com"
-    body_analysis = analyze_email_body(Mail)
+    Merci de votre compréhension.""","https://bnstockton.com"
+    last_seen_id, subject, sender, recipient, raw_date, body_text, links = dico
+    body_analysis = analyze_email_body(body_text)
     print("🛡️ Analyse NLP :\n", body_analysis)
-    
 
-    if link != "":
-        link_grade, link_analyze = linkanalize(link)
+    if links != "":
+        link_grade, link_analyze = linkanalize(links)
+        print("grade link",link_grade)
     else:
         link_grade = 5
         link_analyze ="Impossible de conclure : une des deux analyses a échoué."
+
 
 
     summary=ConclusionMail(body_analysis,link_analyze)
@@ -67,4 +69,11 @@ def test():
     print("reason",reason)
     is_phishing=BoolMail(summary)
     print("bool ", is_phishing)
+    
+    is_phishing = is_phishing.strip().lower() == "true"
+    
+    finale=is_phishing,summary,reason
+    from tools.dynamodb_manager import DynamoDBManager
+    db_manager = DynamoDBManager()
+    db_manager.store_email_analysis(dico, finale)
 
