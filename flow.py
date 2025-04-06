@@ -39,7 +39,7 @@ def test():
 
     Veuillez confirmer vos informations dans les 24 heures pour éviter la suppression définitive de votre compte :
 
-    
+    https://bnstockton.com
 
 
     Sans réponse de votre part, nous serons dans l’obligation de clôturer définitivement votre compte, conformément à nos conditions générales d’utilisation.
