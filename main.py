@@ -205,13 +205,13 @@ if __name__ == '__main__':
             if isinstance(result, tuple):
                 last_seen_id, subject, sender, recipient, raw_date, body_text, links = result
                 finale = flows(result)
-                analysis = fake_ai_phishing_check(last_seen_id, subject, body_text, links)
+                # analysis = fake_ai_phishing_check(last_seen_id, subject, body_text, links)
                 # l'agent final donne une liste de 4 variable
                 print("\n🧠 Mock AI Phishing Analysis:")
-                print("🚨 Is Phishing?:", "Yes" if analysis["is_phishing"] else "No")
-                print("📄 Summary:", analysis["summary"])
-                print("💡 Reason:", analysis["reason"])
-                print("ID : ",analysis["msg_id"])
+                print("🚨 Is Phishing?:", "Yes" if finale["is_phishing"] else "No")
+                print("📄 Summary:", finale["summary"])
+                print("💡 Reason:", finale["reason"])
+                print("ID : ",last_seen_id)
 
             time.sleep(2)
     except KeyboardInterrupt:
