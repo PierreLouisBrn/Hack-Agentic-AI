@@ -166,11 +166,11 @@ def linkanalize(url):
     if vt_data and us_data:
         niveau, explication = evaluer_et_expliquer_risque(vt_data, us_data)
         print(f"\n🔐 Verdict final : {niveau}")
-        #print(explication)
+        print(explication)
     else:
         niveau = 0
         explication="Impossible de conclure : une des deux analyses a échoué."
         print("❌ Impossible de conclure : une des deux analyses a échoué.")
     return niveau, explication
 
-print(linkanalize("https://bnstockton.com"))
+#print(linkanalize("https://bnstockton.com"))

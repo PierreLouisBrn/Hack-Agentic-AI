@@ -22,7 +22,11 @@ def flows(dico):
     print("reason",reason)
     is_phishing=BoolMail(summary)
     print("bool ", is_phishing)
-
+    
+    if is_phishing=="True":
+        is_phishing=True
+    else:
+        is_phishing=False
     
 
     return {
@@ -48,10 +52,10 @@ def test():
     link="https://bnstockton.com"
     body_analysis = analyze_email_body(Mail)
     print("🛡️ Analyse NLP :\n", body_analysis)
+    
 
     if link != "":
         link_grade, link_analyze = linkanalize(link)
-        print("grade link",link_grade)
     else:
         link_grade = 5
         link_analyze ="Impossible de conclure : une des deux analyses a échoué."
@@ -64,4 +68,3 @@ def test():
     is_phishing=BoolMail(summary)
     print("bool ", is_phishing)
 
-test()
