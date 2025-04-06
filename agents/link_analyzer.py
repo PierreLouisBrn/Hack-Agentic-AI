@@ -20,7 +20,7 @@ def analyser_url_virustotal(url):
         return None
 
     print("✅ URL soumise avec succès. ⏳ Attente de l’analyse...")
-    time.sleep(10)
+    time.sleep(20)
 
     url_id = base64.urlsafe_b64encode(url.encode()).decode().strip("=")
     report_response = requests.get(f"{report_url_base}{url_id}", headers=headers)
@@ -64,7 +64,7 @@ def analyser_url_urlscan(url):
 
     uuid = response.json().get("uuid")
     print(f"\n📡 Lien soumis. UUID : {uuid}")
-    time.sleep(10)
+    time.sleep(20)
 
     result = requests.get(f"https://urlscan.io/api/v1/result/{uuid}/")
     if result.status_code != 200:
@@ -111,23 +111,52 @@ def evaluer_et_expliquer_risque(data_vt, data_urlscan):
     urlscan_malicious = verdict.get("malicious", False)
     title = data_urlscan.get("page", {}).get("title", "N/A")
 
-    # Classification finale
-    if malicious >= 10 or urlscan_score >= 5 or urlscan_malicious:
-        niveau = "❌ DANGEREUX"
-    elif malicious >= 3 or suspicious >= 1 or urlscan_score >= 2 or "suspicious" in urlscan_tags:
-        niveau = "⚠️ SUSPECT"
-    else:
-        niveau = "✅ SÛR"
+    prompt = f"""
+Tu es un expert en cybersécurité. On te donne les résultats de l’analyse d’un lien :
+VirusTotal :
+- moteurs malicieux : {malicious}
+- moteurs suspects : {suspicious}
+- catégories : {vt_categories if vt_categories else 'Aucune'}
+- réputation : {vt_reputation}
+- votes : {vt_votes}
 
-    explication = f"""\n🧠 Interprétation :
-Le lien est classé comme **{niveau}** car :
-- VirusTotal signale {malicious} moteurs malicieux, {suspicious} suspects
-- Catégories détectées : {vt_categories if vt_categories else 'Aucune'}
-- Réputation : {vt_reputation}, votes : {vt_votes}
-- urlscan.io indique score = {urlscan_score}, titre = \"{title}\", tags = {urlscan_tags}, malicieux = {urlscan_malicious}
+urlscan.io :
+- score : {urlscan_score}
+- tags : {urlscan_tags}
+- malicieux : {urlscan_malicious}
+- titre de la page : "{title}"
+
+Classe ce lien comme l’un des trois niveaux suivants : 
+1. ❌ DANGEREUX
+2. ⚠️ SUSPECT
+3. ✅ SÛR
+
+Commence ta réponse par le niveau exact (exemple : ❌ DANGEREUX), puis explique brièvement pourquoi.
 """
 
+    headers = {
+        "Authorization": f"Bearer {MISTRAL_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    body = {
+        "model": "mistral-small",  # ou mistral-medium / mistral-large si accessible
+        "messages": [
+            {"role": "user", "content": prompt}
+        ],
+        "temperature": 0.3
+    }
+
+    response = requests.post(MISTRAL_API_URL, headers=headers, json=body)
+    if response.status_code != 200:
+        print("❌ Erreur API Mistral :", response.text)
+        return "Indéterminé", "L'appel à Mistral a échoué."
+
+    content = response.json()["choices"][0]["message"]["content"].strip()
+    niveau = content.split('\n')[0] if '\n' in content else content
+    explication = content
+
     return niveau, explication
+
 
 # === EXÉCUTION ===
 def linkanalize(url):
@@ -143,3 +172,5 @@ def linkanalize(url):
         explication="Impossible de conclure : une des deux analyses a échoué."
         print("❌ Impossible de conclure : une des deux analyses a échoué.")
     return niveau, explication
+
+print(linkanalize("https://bnstockton.com"))
