@@ -5,6 +5,8 @@ import time
 # === CLÉS API ===
 VT_API_KEY = "44f476f9d7fa7bc5e17fd3d684daf305433690539cc8ef695079a611db891de0"
 URLSCAN_API_KEY = "0196069f-be55-752a-a032-f1f368c3ea4d"
+MISTRAL_API_KEY = "OZSyUAoFi2DmsjJz5Cuqg8vWeFzG9grq"
+MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions"
 
 # === VIRUSTOTAL ===
 def analyser_url_virustotal(url):
@@ -49,6 +51,7 @@ def analyser_url_virustotal(url):
 
     return data
 
+
 # === URLSCAN.IO ===
 def analyser_url_urlscan(url):
     headers = {"API-Key": URLSCAN_API_KEY, "Content-Type": "application/json"}
@@ -90,6 +93,9 @@ def analyser_url_urlscan(url):
 
     return data
 
+
+
+
 # === IA : CLASSIFICATION ===
 def evaluer_et_expliquer_risque(data_vt, data_urlscan):
     vt_stats = data_vt.get("last_analysis_stats", {})
@@ -124,17 +130,16 @@ Le lien est classé comme **{niveau}** car :
     return niveau, explication
 
 # === EXÉCUTION ===
-if __name__ == "__main__":
-    url = input("🔗 Entrez l’URL à analyser : ").strip()
-
-    print("\n📡 Lancement de l'analyse...")
-
+def linkanalize(url):
     vt_data = analyser_url_virustotal(url)
     us_data = analyser_url_urlscan(url)
 
     if vt_data and us_data:
         niveau, explication = evaluer_et_expliquer_risque(vt_data, us_data)
         print(f"\n🔐 Verdict final : {niveau}")
-        print(explication)
+        #print(explication)
     else:
+        niveau = 0
+        explication="Impossible de conclure : une des deux analyses a échoué."
         print("❌ Impossible de conclure : une des deux analyses a échoué.")
+    return niveau, explication

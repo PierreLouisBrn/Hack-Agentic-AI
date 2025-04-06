@@ -11,7 +11,7 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-from graph.flow import flows
+from flow import flows
 
 # Gmail API scope
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
@@ -204,9 +204,9 @@ if __name__ == '__main__':
 
             if isinstance(result, tuple):
                 last_seen_id, subject, sender, recipient, raw_date, body_text, links = result
-                flows(result)
+                finale = flows(result)
                 analysis = fake_ai_phishing_check(last_seen_id, subject, body_text, links)
-
+                # l'agent final donne une liste de 4 variable
                 print("\n🧠 Mock AI Phishing Analysis:")
                 print("🚨 Is Phishing?:", "Yes" if analysis["is_phishing"] else "No")
                 print("📄 Summary:", analysis["summary"])
